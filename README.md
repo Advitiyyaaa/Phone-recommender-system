@@ -16,7 +16,7 @@ Clone the Repository:
 
 ```bash
   git clone https://github.com/Advitiyyaaa/Phone-recommender-system.git
-  cd Book-recommender-system
+  cd Phone-recommender-system
 ```
 Create a Virtual Environment:
 
