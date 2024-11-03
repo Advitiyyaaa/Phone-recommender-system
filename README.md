@@ -9,14 +9,14 @@ This repository contains a Phone Recommendation System developed using Machine L
 The primary goal of this project is to create a recommendation engine that suggests phone to users based on their reading history. The model uses collaborative filtering, a popular approach in recommendation systems that makes predictions about a user's interests by collecting preferences from many users.
 ## Key features
 Collaborative Filtering: Utilizes user-item interactions to recommend phone with similar characteristics.
-Streamlit Web Application: A simple and interactive interface where users can input a book title and receive personalized recommendations.
+Streamlit Web Application: A simple and interactive interface where users can input a phone name and receive personalized recommendations.
 ## Setup Instructions
 
 Clone the Repository:
 
 ```bash
   git clone https://github.com/Advitiyyaaa/Phone-recommender-system.git
-  cd Book-recommender-system
+  cd Phone-recommender-system
 ```
 Create a Virtual Environment:
 
