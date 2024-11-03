@@ -1,9 +1,10 @@
 import pandas as pd
 import pickle
 import streamlit as st
+import joblib
+from sklearn.preprocessing import StandardScaler
 
 
-# Set the page background image
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
@@ -20,24 +21,24 @@ page_bg_img = """
 """
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Load the model and dataset
+
 with open('mobile_recommender_model.pkl', 'rb') as model_file:
     cosine_sim = pickle.load(model_file)
 
 data = pd.read_csv('mobiles_dataset.csv')
 
-# Function to get recommendations
 def get_recommendations(product_index, num_recommendations=5):
     sim_scores = list(enumerate(cosine_sim[product_index]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:num_recommendations + 1]  # Exclude the product itself
     recommended_indices = [i[0] for i in sim_scores]
     return data.iloc[recommended_indices]
+model = joblib.load('random_forest_model.pkl')
+scaler = joblib.load('scaler.pkl')
 
 # Sidebar
 st.sidebar.title("Dashboard")
-app_mode = st.sidebar.selectbox("Select Page", ["Home", "About", "Recommendation"])
-
+app_mode = st.sidebar.selectbox("Select Page", ["Home", "About", "Recommendation","Price Predictor"])
 # Main Page
 if app_mode == "Home":
     st.markdown(
@@ -241,3 +242,68 @@ elif app_mode == "Recommendation":
             # Display the product div in Streamlit
             st.markdown(product_div, unsafe_allow_html=True)
             st.image("Home pics/phone1.png", width=300)#Demo image
+elif app_mode == "Price Predictor":
+    st.markdown(
+        """
+        <div style="
+            background-color: rgba(255, 255, 255, 0.9); 
+            padding: 20px; 
+            border-radius: 10px;
+        ">
+            <h1 style="color: black;">Mobile Price Predictor</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    st.markdown("""
+    <style>
+    .selectbox-label {
+        color: black; 
+        font-weight: bold;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    st.markdown('<p class="selectbox-label">Select RAM (in GB)</p>', unsafe_allow_html=True)
+    ram_options = [4, 6, 8, 12, 16, 18, 24]
+    ram = st.selectbox("", ram_options)
+
+    st.markdown("""
+    <style>
+    .selectbox-label {
+        color: black; 
+        font-weight: bold;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    st.markdown('<p class="selectbox-label">Storage (in GB)</p>', unsafe_allow_html=True)
+    storage_options = [8, 16, 32, 64, 128, 256, 512, 1024]
+    storage = st.selectbox("", storage_options)
+
+
+    st.markdown("""
+    <style>
+    .selectbox-label {
+        color: black;
+        font-weight: bold;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    st.markdown('<p class="selectbox-label">Display Size (in inches)</p>', unsafe_allow_html=True)
+    display = st.number_input("", min_value=4.0, max_value=7.5, value=6.1)
+
+    if st.button("Predict Price"):
+        input_data = pd.DataFrame([[ram, storage, display]], columns=['RAM', 'storage', 'display'])
+        
+        # Scale the user inputs
+        input_data_scaled = scaler.transform(input_data)
+        
+        # Make prediction
+        predicted_price = model.predict(input_data_scaled)
+        
+        # Display the result
+        st.markdown(f"""
+        <div style='background-color: white; padding: 6px; border-radius: 10px;'>
+            <h3 style='color: black;'>The predicted price of the mobile is: ₹{predicted_price[0]:.2f}</h3>
+        </div>
+        """, unsafe_allow_html=True)
